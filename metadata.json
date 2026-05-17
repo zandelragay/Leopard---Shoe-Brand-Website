@@ -1,0 +1,8 @@
+{
+  "name": "Leopard: Streetwear Footwear",
+  "description": "High-end, immersive shoe brand landing page for Leopard footwear.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
