@@ -13,11 +13,13 @@ import CustomCursor from './components/CustomCursor';
 import ProductCard from './components/ProductCard';
 import AIChat from './components/AIChat';
 import AdminPanel from './components/AdminPanel';
+import LoadingScreen from './components/LoadingScreen';
 import { useContent } from './hooks/useContent';
 import { Product } from './types';
 
 const App: React.FC = () => {
   const { hero, config, products, features, packages, loading } = useContent();
+  const [showSplash, setShowSplash] = useState(true);
   const { scrollYProgress } = useScroll();
   const y = useTransform(scrollYProgress, [0, 1], [0, -100]);
   const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
@@ -82,16 +84,17 @@ const App: React.FC = () => {
     setSelectedProduct(products[nextIndex]);
   };
 
-  if (loading) return (
-    <div className="h-screen w-full bg-black flex items-center justify-center font-black italic text-orange-500 uppercase tracking-[0.5em] animate-pulse">
-      Initializing Agility...
-    </div>
-  );
-  
   return (
-    <div className="relative min-h-screen text-white selection:bg-orange-500 selection:text-black cursor-auto md:cursor-none overflow-x-hidden pt-20">
-      <CustomCursor />
-      <FluidBackground />
+    <>
+      <AnimatePresence mode="wait">
+        {showSplash && (
+          <LoadingScreen onComplete={() => setShowSplash(false)} />
+        )}
+      </AnimatePresence>
+
+      <div className={`relative min-h-screen text-white selection:bg-orange-500 selection:text-black cursor-auto md:cursor-none overflow-x-hidden pt-20 transition-opacity duration-1000 ${showSplash ? 'opacity-0' : 'opacity-100'}`}>
+        <CustomCursor />
+        <FluidBackground />
       <AIChat />
       <AdminPanel 
         hero={hero} 
@@ -501,7 +504,8 @@ const App: React.FC = () => {
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+      </div>
+    </>
   );
 };
 
