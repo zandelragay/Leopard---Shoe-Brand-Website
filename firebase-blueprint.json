@@ -1,0 +1,91 @@
+{
+  "entities": {
+    "Hero": {
+      "title": "Hero Section",
+      "description": "The main hero area of the landing page",
+      "type": "object",
+      "properties": {
+        "tagline1": { "type": "string" },
+        "tagline2": { "type": "string" },
+        "title": { "type": "string" },
+        "subtitle": { "type": "string" },
+        "ctaText": { "type": "string" }
+      },
+      "required": ["tagline1", "tagline2", "title", "subtitle", "ctaText"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Shoe product information",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "category": { "type": "string" },
+        "price": { "type": "string" },
+        "image": { "type": "string" },
+        "description": { "type": "string" },
+        "colorway": { "type": "string" }
+      },
+      "required": ["id", "name", "category", "price", "image", "description", "colorway"]
+    },
+    "Feature": {
+      "title": "Technology Feature",
+      "description": "A feature highlighting a technology",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "icon": { "type": "string", "enum": ["Zap", "ShieldCheck", "Footprints"] }
+      },
+      "required": ["id", "title", "description", "icon"]
+    },
+    "ShopPackage": {
+      "title": "Shop Package",
+      "description": "Pricing tier for the shop",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "price": { "type": "string" },
+        "tier": { "type": "string" },
+        "accent": { "type": "string" },
+        "features": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["id", "name", "price", "tier", "accent", "features"]
+    },
+    "SiteConfig": {
+       "title": "General Site Config",
+       "description": "Global strings like marquee and footer",
+       "type": "object",
+       "properties": {
+         "marquee": { "type": "array", "items": { "type": "string" } },
+         "footerTagline": { "type": "string" },
+         "footerCopyright": { "type": "string" }
+       },
+       "required": ["marquee", "footerTagline", "footerCopyright"]
+    }
+  },
+  "firestore": {
+    "content/hero": {
+      "schema": "Hero",
+      "description": "Hero section content"
+    },
+    "content/config": {
+      "schema": "SiteConfig",
+      "description": "Global site configuration"
+    },
+    "products/{productId}": {
+      "schema": "Product",
+      "description": "The shoe products collection"
+    },
+    "features/{featureId}": {
+      "schema": "Feature",
+      "description": "Technology features"
+    },
+    "packages/{packageId}": {
+      "schema": "ShopPackage",
+      "description": "Pricing packages"
+    }
+  }
+}

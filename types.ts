@@ -4,6 +4,36 @@
 */
 
 
+export interface HeroContent {
+  tagline1: string;
+  tagline2: string;
+  title: string;
+  subtitle: string;
+  ctaText: string;
+}
+
+export interface SiteConfig {
+  marquee: string[];
+  footerTagline: string;
+  footerCopyright: string;
+}
+
+export interface Feature {
+  id: string;
+  title: string;
+  description: string;
+  icon: 'Zap' | 'ShieldCheck' | 'Footprints';
+}
+
+export interface ShopPackage {
+  id: string;
+  name: string;
+  price: string;
+  tier: string;
+  accent: string;
+  features: string[];
+}
+
 export interface Product {
   id: string;
   name: string;

@@ -6,78 +6,24 @@
 
 import React, { useRef, useState, useEffect } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
-import { ShoppingBag, Globe, Zap, Footprints, ShieldCheck, Menu, X, Package, Box, ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
+import { ShoppingBag, Globe, Zap, Footprints, ShieldCheck, Menu, X, Package, Box, ChevronLeft, ChevronRight, ArrowRight, Lock } from 'lucide-react';
 import FluidBackground from './components/FluidBackground';
 import GradientText from './components/GlitchText';
 import CustomCursor from './components/CustomCursor';
 import ProductCard from './components/ProductCard';
 import AIChat from './components/AIChat';
+import AdminPanel from './components/AdminPanel';
+import { useContent } from './hooks/useContent';
 import { Product } from './types';
 
-// Leopard Collection Data
-const COLLECTION: Product[] = [
-  { 
-    id: '1', 
-    name: 'Prowler V1', 
-    category: 'Elite Runner', 
-    price: '$220', 
-    image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=1000&auto=format&fit=crop',
-    description: 'Designed for the urban predator. Features Leopard-Claw traction and ultra-light kinetic foam for unparalleled explosive speed.',
-    colorway: 'Eclipse / Solar Orange'
-  },
-  { 
-    id: '2', 
-    name: 'Stealth Mid', 
-    category: 'Tactical Boot', 
-    price: '$350', 
-    image: 'https://images.unsplash.com/photo-1514989940723-e8e51635b782?q=80&w=1000&auto=format&fit=crop',
-    description: 'The ultimate urban exploration gear. Water-resistant tech silk upper with a carbon-fiber plate for maximum stability in any terrain.',
-    colorway: 'Midnight Gray'
-  },
-  { 
-    id: '3', 
-    name: 'Neon Talon', 
-    category: 'Hyper Low-Top', 
-    price: '$500', 
-    image: 'https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?q=80&w=1000&auto=format&fit=crop',
-    description: 'Where high-fashion hits the street. Limited release featuring heat-reactive pigments and an integrated LED suspension system.',
-    colorway: 'Prism / Chrome'
-  },
-  { 
-    id: '4', 
-    name: 'Aero Dash', 
-    category: 'Performance Lite', 
-    price: '$180', 
-    image: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?q=80&w=1000&auto=format&fit=crop',
-    description: 'Weightless agility. The Aero Dash series utilizes a single-thread knit construction to wrap your foot like a second skin.',
-    colorway: 'Velocity White'
-  },
-  { 
-    id: '5', 
-    name: 'Apex King', 
-    category: 'Brutalist High', 
-    price: '$420', 
-    image: 'https://images.unsplash.com/photo-1605348532760-6753d2c43329?q=80&w=1000&auto=format&fit=crop',
-    description: 'Command the concrete. A statement piece with oversized proportions and a multi-layered silhouette inspired by brutalist architecture.',
-    colorway: 'Concrete / Amber'
-  },
-  { 
-    id: '6', 
-    name: 'Void Runner', 
-    category: 'Conceptual Trainer', 
-    price: '$890', 
-    image: 'https://images.unsplash.com/photo-1460353581641-37baddab0fa2?q=80&w=1000&auto=format&fit=crop',
-    description: 'Pushing the boundaries of footwear. 3D printed liquid-polymer lattice mid-sole provides the most cushioned experience in existence.',
-    colorway: 'Absolute Black'
-  },
-];
-
 const App: React.FC = () => {
+  const { hero, config, products, features, packages, loading } = useContent();
   const { scrollYProgress } = useScroll();
   const y = useTransform(scrollYProgress, [0, 1], [0, -100]);
   const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isAdminOpen, setIsAdminOpen] = useState(false);
   
   const [purchasingIndex, setPurchasingIndex] = useState<number | null>(null);
   const [purchasedIndex, setPurchasedIndex] = useState<number | null>(null);
@@ -93,6 +39,13 @@ const App: React.FC = () => {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [selectedProduct]);
+
+  // Fallback for features and packages
+  const displayFeatures = features.length > 0 ? features : [
+    { id: '1', icon: Zap, title: 'Kinetic Foam', description: '98% energy return with every stride. Propulsion redefined.' },
+    { id: '2', icon: ShieldCheck, title: 'Tactile Silk', description: 'Synthetic spider-silk upper. Industrial strength, weightless feel.' },
+    { id: '3', icon: Footprints, title: 'Claw Sole', description: 'Omni-directional grip patterns inspired by jungle predators.' },
+  ];
 
   const handlePurchase = (index: number) => {
     setPurchasingIndex(index);
@@ -119,21 +72,37 @@ const App: React.FC = () => {
 
   const navigateProduct = (direction: 'next' | 'prev') => {
     if (!selectedProduct) return;
-    const currentIndex = COLLECTION.findIndex(p => p.id === selectedProduct.id);
+    const currentIndex = products.findIndex(p => p.id === selectedProduct.id);
     let nextIndex;
     if (direction === 'next') {
-      nextIndex = (currentIndex + 1) % COLLECTION.length;
+      nextIndex = (currentIndex + 1) % products.length;
     } else {
-      nextIndex = (currentIndex - 1 + COLLECTION.length) % COLLECTION.length;
+      nextIndex = (currentIndex - 1 + products.length) % products.length;
     }
-    setSelectedProduct(COLLECTION[nextIndex]);
+    setSelectedProduct(products[nextIndex]);
   };
+
+  if (loading) return (
+    <div className="h-screen w-full bg-black flex items-center justify-center font-black italic text-orange-500 uppercase tracking-[0.5em] animate-pulse">
+      Initializing Agility...
+    </div>
+  );
   
   return (
     <div className="relative min-h-screen text-white selection:bg-orange-500 selection:text-black cursor-auto md:cursor-none overflow-x-hidden pt-20">
       <CustomCursor />
       <FluidBackground />
       <AIChat />
+      <AdminPanel 
+        hero={hero} 
+        config={config} 
+        products={products} 
+        features={displayFeatures as any} 
+        packages={packages} 
+        onRefresh={() => {}} 
+        isOpen={isAdminOpen}
+        setIsOpen={setIsAdminOpen}
+      />
       
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-12 py-8 mix-blend-difference">
@@ -210,15 +179,15 @@ const App: React.FC = () => {
             transition={{ duration: 1, delay: 0.2 }}
             className="flex items-center gap-4 text-xs md:text-sm font-mono text-orange-400 tracking-[0.4em] uppercase mb-6"
           >
-            <span>Engineered</span>
+            <span>{hero.tagline1}</span>
             <span className="w-1 h-1 bg-orange-600 rounded-full"/>
-            <span>Agility</span>
+            <span>{hero.tagline2}</span>
           </motion.div>
 
           {/* Main Title */}
           <div className="relative w-full flex justify-center items-center">
             <GradientText 
-              text="LEOPARD" 
+              text={hero.title} 
               as="h1" 
               className="text-[18vw] md:text-[16vw] leading-[0.8] font-black tracking-tighter text-center italic" 
             />
@@ -243,7 +212,7 @@ const App: React.FC = () => {
             transition={{ delay: 1, duration: 1 }}
             className="text-lg md:text-3xl font-light max-w-2xl mx-auto text-white/70 leading-relaxed uppercase tracking-widest"
           >
-            The peak of urban predator gear
+            {hero.subtitle}
           </motion.p>
           
           <motion.button
@@ -254,7 +223,7 @@ const App: React.FC = () => {
             className="mt-12 group flex items-center gap-4 text-sm font-bold tracking-[0.3em] uppercase"
             data-hover="true"
           >
-            Explore Drop <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform color-orange-500" />
+            {hero.ctaText} <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform color-orange-500" />
           </motion.button>
         </motion.div>
 
@@ -269,8 +238,12 @@ const App: React.FC = () => {
               <div key={key} className="flex whitespace-nowrap shrink-0">
                 {[...Array(6)].map((_, i) => (
                   <span key={i} className="text-4xl md:text-8xl font-black px-12 flex items-center gap-6 opacity-30 italic">
-                    LEOPARD <span className="text-orange-600">⚡</span> 
-                    PROWLER V1 <span className="text-orange-600">⚡</span> 
+                    {config.marquee.map((item, idx) => (
+                      <React.Fragment key={idx}>
+                        {item} {idx < config.marquee.length - 1 && <span className="text-orange-600">⚡</span>}
+                      </React.Fragment>
+                    ))}
+                    <span className="text-orange-600">⚡</span> 
                   </span>
                 ))}
               </div>
@@ -293,7 +266,7 @@ const App: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 border-t border-l border-white/10">
-            {COLLECTION.map((product) => (
+            {products.map((product) => (
               <ProductCard key={product.id} product={product} onClick={() => setSelectedProduct(product)} />
             ))}
           </div>
@@ -310,18 +283,14 @@ const App: React.FC = () => {
               </h2>
               
               <div className="space-y-12">
-                {[
-                  { icon: Zap, title: 'Kinetic Foam', desc: '98% energy return with every stride. Propulsion redefined.' },
-                  { icon: ShieldCheck, title: 'Tactile Silk', desc: 'Synthetic spider-silk upper. Industrial strength, weightless feel.' },
-                  { icon: Footprints, title: 'Claw Sole', desc: 'Omni-directional grip patterns inspired by jungle predators.' },
-                ].map((feature, i) => (
+                {displayFeatures.map((feature, i) => (
                   <div key={i} className="flex items-start gap-8 group">
                     <div className="p-5 rounded-full bg-orange-600/10 border border-orange-500/20 group-hover:bg-orange-600 transition-colors duration-500">
                       <feature.icon className="w-8 h-8 text-orange-500 group-hover:text-white transition-colors" />
                     </div>
                     <div>
                       <h4 className="text-2xl font-black mb-3 italic">{feature.title}</h4>
-                      <p className="text-gray-400 leading-relaxed font-mono text-sm">{feature.desc}</p>
+                      <p className="text-gray-400 leading-relaxed font-mono text-sm">{feature.description}</p>
                     </div>
                   </div>
                 ))}
@@ -412,7 +381,7 @@ const App: React.FC = () => {
           <div>
              <div className="font-heading text-5xl font-black tracking-tighter mb-4 italic">LEOPARD</div>
              <div className="font-mono text-xs text-gray-600 uppercase tracking-widest">
-               Design by LEOPARD Urban Systems © 2026
+               {config.footerTagline} {config.footerCopyright}
              </div>
           </div>
           
@@ -421,6 +390,16 @@ const App: React.FC = () => {
             <a href="#" className="hover:text-orange-500 transition-colors">Discord</a>
             <a href="#" className="hover:text-orange-500 transition-colors">Manifesto</a>
           </div>
+        </div>
+
+        <div className="mt-20 pb-8 flex justify-center">
+           <button 
+             onClick={() => setIsAdminOpen(true)}
+             className="p-3 rounded-full border border-white/10 bg-white/[0.02] text-white/20 hover:text-orange-500 hover:border-orange-500/30 hover:bg-orange-500/5 transition-all"
+             title="System Access"
+           >
+             <Lock className="w-3.5 h-3.5" />
+           </button>
         </div>
       </footer>
 

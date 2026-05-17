@@ -10,13 +10,15 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0",
-    "lucide-react": "^0.553.0",
     "@google/genai": "^1.29.0",
-    "framer-motion": "^12.23.24"
+    "firebase": "^12.13.0",
+    "framer-motion": "^12.23.24",
+    "lucide-react": "^0.553.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
   },
   "devDependencies": {
+    "@firebase/eslint-plugin-security-rules": "^0.0.2",
     "@types/node": "^22.14.0",
     "@vitejs/plugin-react": "^5.0.0",
     "typescript": "~5.8.2",
